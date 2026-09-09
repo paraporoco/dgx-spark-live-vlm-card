@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en" class="nv-dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Live VLM</title>
+<!-- Optional: reuse the dashboard's own design-system stylesheet so this
+     standalone page matches the injected card exactly. The filename is
+     content-hashed and therefore specific to a dashboard version (0.29.2-2);
+     if it 404s the fallback CSS below covers everything. -->
+<link rel="stylesheet" href="http://127.0.0.1:11000/assets/root-D_Jd45NP.css">
+<style>
+  :root { color-scheme: dark; }
+  body { margin:0; padding:40px 24px; background:#0d0d0d; color:#e6e6e6;
+    font-family:"NVIDIA Sans",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+    display:flex; justify-content:center; }
+  .wrap { width:100%; max-width:760px; display:flex; flex-direction:column; gap:20px; }
+  h1 { font-size:18px; font-weight:600; margin:0; letter-spacing:.01em; }
+  .sub { font-size:13px; opacity:.6; margin:0; }
+  .nv-panel { border:1px solid #2a2a2a; background:#141414; border-radius:8px; }
+  .nv-button { border:1px solid #3a3a3a; background:#1e1e1e; color:#e6e6e6;
+    border-radius:6px; padding:6px 14px; font-size:13px; cursor:pointer;
+    text-decoration:none; display:inline-flex; align-items:center; }
+  .nv-button--color-brand { background:#76b900; border-color:#76b900; color:#0d0d0d; font-weight:600; }
+  .nv-button:disabled { opacity:.4; cursor:not-allowed; }
+  .nv-tag { border:1px solid #3a3a3a; border-radius:999px; padding:2px 10px; font-size:11px; }
+  .nv-text--mono-sm { font-family:ui-monospace,"SF Mono",Menlo,monospace; font-size:12px; }
+  .flex-1 { flex:1 1 0%; }
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <div>
+      <h1>Live VLM</h1>
+      <p class="sub">Standalone view of the card injected into the DGX Dashboard. Same control plane.</p>
+    </div>
+    <div class="flex gap-4 flex-wrap" style="display:flex;gap:16px;flex-wrap:wrap;"></div>
+  </div>
+  <script src="/card.js"></script>
+</body>
+</html>

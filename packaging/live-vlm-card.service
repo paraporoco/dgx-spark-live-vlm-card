@@ -1,0 +1,36 @@
+[Unit]
+Description=Live VLM card - live-vlm-webui control sidecar for the DGX Dashboard
+Documentation=https://github.com/paraporoco/dgx-spark-live-vlm-card
+After=network-online.target
+
+[Service]
+Type=simple
+Environment=LVC_HOST=127.0.0.1
+Environment=LVC_PORT=8112
+Environment=LVC_UNIT=live-vlm-webui.service
+Environment=LVC_WEBROOT=REPLACE_PREFIX/web
+Environment=LVC_WEBUI_SCHEME=https
+Environment=LVC_WEBUI_PORT=8120
+# Leave LVC_PUBLIC_HOSTS unset to auto-detect this host's LAN addresses.
+#Environment=LVC_PUBLIC_HOSTS=
+Environment=LVC_API_BASE=http://127.0.0.1:8111/v1
+Environment=LVC_SWAP_URL=http://127.0.0.1:8100
+Environment=LVC_MODEL=REPLACE_MODEL
+Environment=LVC_SWAP_CONFIG=/etc/llama-swap/config.yaml
+Environment=LIVE_VLM_PROCESS_EVERY=30
+Environment=PYTHONDONTWRITEBYTECODE=1
+Environment=PYTHONUNBUFFERED=1
+ExecStart=/usr/bin/python3 REPLACE_PREFIX/live_vlm_card.py
+Restart=on-failure
+RestartSec=5
+
+NoNewPrivileges=yes
+PrivateTmp=yes
+ProtectKernelTunables=yes
+ProtectControlGroups=yes
+RestrictNamespaces=yes
+LockPersonality=yes
+SystemCallArchitectures=native
+
+[Install]
+WantedBy=default.target

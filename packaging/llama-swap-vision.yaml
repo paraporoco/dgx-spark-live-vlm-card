@@ -1,0 +1,59 @@
+# Drop these into /etc/llama-swap/config.yaml. llama-swap run with
+# -watch-config picks the change up live; no restart, and nothing resident
+# is dropped.
+#
+# Every model here carries --mmproj. That flag is the whole contract: the
+# card and the gate discover which models can see by scanning for it, so a
+# model added here needs no code change anywhere.
+#
+# Context is deliberately 8192, not 16384. A 16k context died with
+# "upstream command exited prematurely" under memory pressure on a 121 GiB
+# GB10; a webcam caption needs nothing like 16k.
+
+models:
+
+  qwen3-vl-4b:
+    name: "Qwen3-VL 4B Q4_K_M (vision, low latency)"
+    cmd: |
+      ${server}
+      -m /opt/models/vlm/Qwen3VL-4B-Instruct-Q4_K_M.gguf
+      --mmproj /opt/models/vlm/mmproj-Qwen3VL-4B-Instruct-F16.gguf
+      -ngl 99 -fa on -c 8192
+      --jinja
+    ttl: 900
+
+  qwen3-vl-8b:
+    name: "Qwen3-VL 8B Q4_K_M (vision)"
+    cmd: |
+      ${server}
+      -m /opt/models/vlm/Qwen3VL-8B-Instruct-Q4_K_M.gguf
+      --mmproj /opt/models/vlm/mmproj-Qwen3VL-8B-Instruct-F16.gguf
+      -ngl 99 -fa on -c 8192
+      --jinja
+    ttl: 900
+
+  cosmos-reason1-7b:
+    name: "NVIDIA Cosmos-Reason1 7B UD-Q4_K_XL (vision, physical AI)"
+    cmd: |
+      ${server}
+      -m /opt/models/vlm/Cosmos-Reason1-7B-UD-Q4_K_XL.gguf
+      --mmproj /opt/models/vlm/mmproj-Cosmos-Reason1-7B-F16.gguf
+      -ngl 99 -fa on -c 8192
+      --jinja
+    ttl: 900
+
+groups:
+
+  # persistent: true is the load-bearing line. exclusive: false alone does NOT
+  # protect this group: loading a member of another group that is
+  # exclusive: true still evicts it. Measured, then fixed - see docs/findings.md.
+  #
+  # swap: true keeps this cheap: only one vision model is resident at a time.
+  vision:
+    swap: true
+    exclusive: false
+    persistent: true
+    members:
+      - qwen3-vl-4b
+      - qwen3-vl-8b
+      - cosmos-reason1-7b

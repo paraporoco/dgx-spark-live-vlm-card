@@ -1,0 +1,31 @@
+[Unit]
+Description=Live VLM WebUI (WebRTC camera -> local VLM via the llama-swap load gate)
+Documentation=https://github.com/NVIDIA-AI-IOT/live-vlm-webui
+After=network-online.target live-vlm-card.service
+Wants=network-online.target live-vlm-card.service
+
+[Service]
+Type=simple
+WorkingDirectory=REPLACE_VENV_PREFIX
+# The card's vision filter, not the gate directly: it narrows the model list
+# to models that can actually see. See README, "Two places the check lives".
+Environment=LIVE_VLM_API_BASE=http://127.0.0.1:8112/v1
+Environment=LIVE_VLM_DEFAULT_MODEL=REPLACE_MODEL
+Environment=LIVE_VLM_PROCESS_EVERY=30
+ExecStart=REPLACE_VENV_PREFIX/.venv/bin/live-vlm-webui \
+    --host 0.0.0.0 --port 8120 \
+    --api-base http://127.0.0.1:8112/v1 \
+    --model REPLACE_MODEL \
+    --api-key EMPTY \
+    --ssl-cert %h/.config/live-vlm-webui/cert.pem \
+    --ssl-key %h/.config/live-vlm-webui/key.pem
+Restart=on-failure
+RestartSec=3
+NoNewPrivileges=yes
+PrivateTmp=yes
+ProtectHome=read-only
+ProtectSystem=strict
+ReadWritePaths=%h/.config/live-vlm-webui
+
+[Install]
+WantedBy=default.target
