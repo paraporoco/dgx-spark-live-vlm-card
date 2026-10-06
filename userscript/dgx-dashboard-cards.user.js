@@ -1,8 +1,8 @@
 // ==UserScript==
-// @name         DGX Dashboard — custom cards (Local models + Live VLM)
+// @name         DGX Dashboard — custom cards (Local models + Live VLM + ComfyUI)
 // @namespace    github.com/paraporoco/dgx-spark-model-card
-// @version      2.3.0
-// @description  Injects the local sidecar cards into the NVIDIA DGX Dashboard: Local models (:8110) and Live VLM (:8112). Touches no NVIDIA file.
+// @version      2.4.0
+// @description  Injects the local sidecar cards into the NVIDIA DGX Dashboard: Local models (:8110), Live VLM (:8112) and ComfyUI (:8113). Touches no NVIDIA file.
 // @homepageURL  https://github.com/paraporoco/dgx-spark-model-card
 // @match        http://localhost:11000/*
 // @match        http://127.0.0.1:11000/*
@@ -13,26 +13,28 @@
 // ==/UserScript==
 
 /*
- * Replaces "DGX Dashboard — Local models card" v2.2.0. Disable that one; this
- * script injects both cards.
+ * Replaces v2.3.0 (Local models + Live VLM). Same mechanism, one more card.
  *
  * Each entry below is a sidecar that serves its own /card.js. All card markup,
  * polling and controls live server-side on the Spark, so changing a card means
  * editing card.js there — no userscript edit.
  *
  * Remote use
- *   Both sidecars bind 127.0.0.1 only. From another machine, forward every
+ *   All sidecars bind 127.0.0.1 only. From another machine, forward every
  *   port you want:
- *       ssh -L 11000:127.0.0.1:11000 -L 8110:127.0.0.1:8110 -L 8112:127.0.0.1:8112 you@spark
- *   Through NVIDIA Sync, register 8110 and 8112 in custom.json and reconnect.
+ *       ssh -L 11000:127.0.0.1:11000 -L 8110:127.0.0.1:8110 \
+ *           -L 8112:127.0.0.1:8112 -L 8113:127.0.0.1:8113 you@spark
+ *   Through NVIDIA Sync, register 8110, 8112 and 8113 in custom.json and
+ *   reconnect.
  *
- * The Live VLM WebUI itself (:8120) is NOT tunnelled: it is reached directly
- * over the LAN or Tailscale on https, because WebRTC media does not survive a
- * TCP-only tunnel. The card links to the right URL.
+ * The Live VLM WebUI (:8120) and ComfyUI (:8188) themselves are NOT tunnelled:
+ * they are reached directly over the LAN or Tailscale. The cards link to the
+ * right URLs.
  *
  * Remove a card without touching the extension:
  *     window.__dgxModelCard.destroy()
  *     window.__liveVlmCard.destroy()
+ *     window.__comfyuiCard.destroy()
  */
 
 (function () {
@@ -40,7 +42,8 @@
 
   var CARDS = [
     { id: "dgx-model-card-loader", src: "http://127.0.0.1:8110", label: "Local models" },
-    { id: "live-vlm-card-loader",  src: "http://127.0.0.1:8112", label: "Live VLM" }
+    { id: "live-vlm-card-loader",  src: "http://127.0.0.1:8112", label: "Live VLM" },
+    { id: "comfyui-card-loader",   src: "http://127.0.0.1:8113", label: "ComfyUI" }
   ];
 
   function inject(c) {
